@@ -36,7 +36,7 @@ mixin Printing {
         final Map<String, dynamic> params = <String, dynamic>{
           'doc': Uint8List.fromList(bytes),
         };
-        await _channel.invokeMethod<void>('writePdf', params);
+        await _channel.invokeMethod('writePdf', params);
         return Future<void>.value();
     }
   }
@@ -45,11 +45,31 @@ mixin Printing {
   /// the Pdf document is re-built in a [LayoutCallback] each time the
   /// user changes a setting like the page format or orientation.
   static Future<void> layoutPdf(
-      {@required LayoutCallback onLayout, String name = 'Document'}) async {
+      {@required LayoutCallback onLayout, String name = 'Document', String printer}) async {
     _onLayout = onLayout;
     _channel.setMethodCallHandler(_handleMethod);
-    final Map<String, dynamic> params = <String, dynamic>{'name': name};
-    await _channel.invokeMethod<void>('printPdf', params);
+    final Map<String, dynamic> params = <String, dynamic>{
+      'name': name,
+      'printer': printer
+    };
+
+    if (printer != null) {
+      await _channel.invokeMethod('directPrintPdf', params);
+    } else {
+      await _channel.invokeMethod('printPdf', params);
+    }
+  }
+
+  /// Opens the native printer picker interface, and returns the URL of the selected printer.
+  static Future<String> pickPrinter({Rect bounds}) async {
+    _channel.setMethodCallHandler(_handleMethod);
+    final Map<String, dynamic> params = <String, dynamic>{
+      'x': bounds.left,
+      'y': bounds.top,
+      'w': bounds.width,
+      'h': bounds.height,
+    };
+    return await _channel.invokeMethod('pickPrinter', params);
   }
 
   /// Prints a [PdfDocument] or a pdf stream to a local printer using the platform UI
@@ -82,6 +102,6 @@ mixin Printing {
       'w': bounds.width,
       'h': bounds.height,
     };
-    await _channel.invokeMethod<void>('sharePdf', params);
+    await _channel.invokeMethod('sharePdf', params);
   }
 }

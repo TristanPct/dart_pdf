@@ -41,6 +41,10 @@
   if ([@"printPdf" isEqualToString:call.method]) {
     [self printPdf:[call.arguments objectForKey:@"name"]];
     result(@1);
+  } else if ([@"directPrintPdf" isEqualToString:call.method]) {
+    [self directPrintPdf:[call.arguments objectForKey:@"name"]
+        withPrinter:[call.arguments objectForKey:@"printer"]];
+    result(@1);
   } else if ([@"writePdf" isEqualToString:call.method]) {
     [self writePdf:[call.arguments objectForKey:@"doc"]];
     result(@1);
@@ -52,7 +56,14 @@
                            [[call.arguments objectForKey:@"w"] floatValue],
                            [[call.arguments objectForKey:@"h"] floatValue])];
     result(@1);
-  } else {
+  } else if ([@"pickPrinter" isEqualToString:call.method]) {
+    [self pickPrinter:CGRectMake(
+                        [[call.arguments objectForKey:@"x"] floatValue],
+                        [[call.arguments objectForKey:@"y"] floatValue],
+                        [[call.arguments objectForKey:@"w"] floatValue],
+                        [[call.arguments objectForKey:@"h"] floatValue])
+          result:result];
+  }else {
     result(FlutterMethodNotImplemented);
   }
 }
@@ -85,6 +96,70 @@
       };
 
   [controller presentAnimated:YES completionHandler:completionHandler];
+}
+
+- (void)directPrintPdf:(nonnull NSString*)name
+    withPrinter:(NSString*)printerID {
+  BOOL printing = [UIPrintInteractionController isPrintingAvailable];
+  if (!printing) {
+    NSLog(@"printing not available");
+    return;
+  }
+
+  UIPrintInteractionController* controller =
+      [UIPrintInteractionController sharedPrintController];
+  [controller setDelegate:self];
+
+  UIPrintInfo* printInfo = [UIPrintInfo printInfo];
+  printInfo.jobName = name;
+  printInfo.outputType = UIPrintInfoOutputGeneral;
+  controller.printInfo = printInfo;
+  renderer = [[PdfPrintPageRenderer alloc] init:channel];
+  [controller setPrintPageRenderer:renderer];
+  UIPrintInteractionCompletionHandler completionHandler =
+      ^(UIPrintInteractionController* printController, BOOL completed, NSError* error) {
+        if (!completed && error) {
+          NSLog(@"FAILED! due to error in domain %@ with error code %u",
+                error.domain, (unsigned int)error.code);
+        }
+        self->renderer = nil;
+      };
+
+  NSURL* printerURL = [NSURL URLWithString:printerID];
+  UIPrinter* printer = [UIPrinter printerWithURL:printerURL];
+
+  [controller printToPrinter:printer completionHandler:completionHandler];
+}
+
+- (void) pickPrinter:(CGRect)rect
+    result:(FlutterResult)result {
+    UIPrinterPickerController* controller =
+    [UIPrinterPickerController printerPickerControllerWithInitiallySelectedPrinter:nil];
+
+    UIPrinterPickerCompletionHandler handler =
+    ^(UIPrinterPickerController *printerPickerController, BOOL selected, NSError *error) {
+        if (error) {
+          NSLog(@"FAILED! due to error in domain %@ with error code %u",
+                error.domain, (unsigned int)error.code);
+          result(@1);
+        } else if (selected) {
+          result(printerPickerController.selectedPrinter.URL.absoluteString);
+        } else {
+          result(nil);
+        }
+    };
+
+    if (UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiomPad) {
+        UIViewController* viewController =
+          [UIApplication sharedApplication].keyWindow.rootViewController;
+        [controller presentFromRect:rect
+                             inView:viewController.view
+                           animated:YES
+                  completionHandler:handler];
+    } else {
+        [controller presentAnimated:YES
+                  completionHandler:handler];
+    }
 }
 
 - (void)writePdf:(nonnull FlutterStandardTypedData*)data {

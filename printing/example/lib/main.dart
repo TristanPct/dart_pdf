@@ -24,9 +24,36 @@ class MyAppState extends State<MyApp> {
   final GlobalKey<State<StatefulWidget>> shareWidget = GlobalKey();
   final GlobalKey<State<StatefulWidget>> previewContainer = GlobalKey();
 
+  static String selectedPrinter;
+
   Future<void> _printPdf() async {
     print('Print ...');
     await Printing.layoutPdf(
+        onLayout: (PdfPageFormat format) async =>
+            (await generateDocument(format)).save());
+  }
+
+  Future<void> _pickPrinter() async {
+    print('Pick printer ...');
+    
+    // Calculate the widget center for iPad sharing popup position
+    final RenderBox referenceBox =
+        shareWidget.currentContext.findRenderObject();
+    final Offset topLeft =
+        referenceBox.localToGlobal(referenceBox.paintBounds.topLeft);
+    final Offset bottomRight =
+        referenceBox.localToGlobal(referenceBox.paintBounds.bottomRight);
+    final Rect bounds = Rect.fromPoints(topLeft, bottomRight);
+    
+    selectedPrinter = await Printing.pickPrinter(bounds: bounds);
+
+    print('Select printer: $selectedPrinter');
+  }
+
+  Future<void> _directPrintPdf() async {
+    print('Direct print ...');
+    await Printing.layoutPdf(
+        printer: selectedPrinter,
         onLayout: (PdfPageFormat format) async =>
             (await generateDocument(format)).save());
   }
@@ -107,7 +134,14 @@ class MyAppState extends State<MyApp> {
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 RaisedButton(
-                    child: const Text('Print Document'), onPressed: _printPdf),
+                    child: const Text('Print Document'),
+                    onPressed: _printPdf),
+                RaisedButton(
+                    child: const Text('Pick Printer'),
+                    onPressed: _pickPrinter),
+                RaisedButton(
+                    child: const Text('Direct Print Document'),
+                    onPressed: _directPrintPdf),
                 RaisedButton(
                     key: shareWidget,
                     child: const Text('Share Document'),
