@@ -70,7 +70,7 @@ class PDFAnnot extends PdfAnnot {
   static const PdfBorderStyle BEVELED = PdfBorderStyle.beveled;
   static const PdfBorderStyle INSET = PdfBorderStyle.inset;
   static const PdfBorderStyle UNDERLINED = PdfBorderStyle.underlined;
-  static const double FULL_PAGE = -9999.0;
+  static const double FULL_PAGE = -9999;
 }
 
 @deprecated
@@ -127,6 +127,11 @@ class PDFFont extends PdfFont {
   factory PDFFont(PdfDocument pdfDocument, {String subtype, String baseFont}) {
     subtype ??= baseFont;
     return PdfFont.helvetica(pdfDocument);
+  }
+
+  @override
+  PdfFontMetrics glyphMetrics(int charCode) {
+    return PdfFontMetrics.zero;
   }
 }
 

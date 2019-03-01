@@ -27,8 +27,7 @@ void main() {
 
     final Document pdf = Document();
 
-    final TextStyle symbol =
-        TextStyle(font: PdfFont.zapfDingbats(pdf.document));
+    final TextStyle symbol = TextStyle(font: Font.zapfDingbats());
 
     final List<int> imData = zlib.decode(base64.decode(
         'eJz7//8/w388uOTCT6a4Ez96Q47++I+OI479mEVALyNU7z9seuNP/mAm196Ekz8YR+0dWHtBmJC9S+7/Zog89iMIKLYaHQPVJGLTD7MXpDfq+I9goNhPdPPDjv3YlnH6Jye6+2H21l/6yeB/4HsSDr1bQXrRwq8HqHcGyF6QXp9933N0tn/7Y7vn+/9gLPaih0PDlV9MIAzVm6ez7dsfzW3f/oMwzAx0e7FhoJutdbcj9MKw9frnL2J2POfBpxeEg478YLba/X0Wsl6lBXf+s0bP/s8ePXeWePJCvPEJNYMRZIYWSO/cq/9Z/Nv+M4bO+M8YDjFDJGkhzvSE7A6jRTdnsQR2wfXCMLHuMC5byyidvGgWE5JeZDOIcYdR+TpmkBno+mFmAAC+DGhl'));
@@ -36,8 +35,8 @@ void main() {
         PdfImage(pdf.document, image: imData, width: 16, height: 20);
 
     pdf.addPage(Page(
-        pageFormat: const PdfPageFormat(400.0, 400.0),
-        margin: const EdgeInsets.all(10.0),
+        pageFormat: const PdfPageFormat(400, 400),
+        margin: const EdgeInsets.all(10),
         build: (Context context) => Column(children: <Widget>[
               Container(
                   padding: const EdgeInsets.all(5),
@@ -49,11 +48,11 @@ void main() {
                           bottom: true,
                           left: true,
                           right: true,
-                          width: 2.0)),
+                          width: 2)),
                   child: Text('Hello World',
-                      textScaleFactor: 2.0, textAlign: TextAlign.center)),
+                      textScaleFactor: 2, textAlign: TextAlign.center)),
               Align(alignment: Alignment.topLeft, child: Text('Left align')),
-              Padding(padding: const EdgeInsets.all(5.0)),
+              Padding(padding: const EdgeInsets.all(5)),
               Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
@@ -76,30 +75,31 @@ void main() {
               Container(
                   padding: const EdgeInsets.only(top: 5),
                   decoration: const BoxDecoration(
-                      border: BoxBorder(top: true, width: 1.0)),
+                      border: BoxBorder(top: true, width: 1)),
                   child: Text("That's all Folks!",
                       textAlign: TextAlign.center,
-                      style: Theme.of(context).defaultTextStyle.copyWith(
-                          font: PdfFont.timesBoldItalic(pdf.document)),
-                      textScaleFactor: 3.0)),
+                      style: Theme.of(context)
+                          .defaultTextStyle
+                          .copyWith(font: Font.timesBoldItalic()),
+                      textScaleFactor: 3)),
             ])));
 
     pdf.addPage(Page(
-        pageFormat: const PdfPageFormat(400.0, 400.0),
-        margin: const EdgeInsets.all(10.0),
+        pageFormat: const PdfPageFormat(400, 400),
+        margin: const EdgeInsets.all(10),
         build: (Context context) => Center(
             child: GridView(
                 crossAxisCount: 3,
                 direction: Axis.vertical,
-                crossAxisSpacing: 10.0,
-                mainAxisSpacing: 10.0,
-                padding: const EdgeInsets.all(10.0),
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+                padding: const EdgeInsets.all(10),
                 children: List<Widget>.generate(
                     9, (int n) => FittedBox(child: Text('${n + 1}')))))));
 
     pdf.addPage(MultiPage(
-        pageFormat: const PdfPageFormat(400.0, 200.0),
-        margin: const EdgeInsets.all(10.0),
+        pageFormat: const PdfPageFormat(400, 200),
+        margin: const EdgeInsets.all(10),
         build: (Context context) => <Widget>[
               Table.fromTextArray(context: context, data: <List<String>>[
                 <String>['Company', 'Contact', 'Country'],
@@ -133,17 +133,49 @@ void main() {
                 <String>['York Steak House', 'Outi Vuorinen', 'Finland'],
                 <String>['Weathervane', 'Else Jeremiassen', 'Iceland'],
               ]),
-              CustomPaint(
-                  size: const PdfPoint(50, 50),
-                  painter: (PdfGraphics canvas, PdfPoint size) {
-                    canvas
-                      ..setColor(PdfColor.indigo)
-                      ..drawRRect(0, 0, size.x, size.y, 10, 10)
-                      ..fillPath();
-                  }),
             ]));
 
+    pdf.addPage(Page(
+        pageFormat: const PdfPageFormat(400, 200),
+        margin: const EdgeInsets.all(10),
+        build: (Context context) => Stack(overflow: Overflow.visible,
+                // fit: StackFit.expand,
+                // alignment: Alignment.bottomRight,
+                children: <Widget>[
+                  Positioned(
+                      right: 10,
+                      top: 10,
+                      child: CustomPaint(
+                          size: const PdfPoint(50, 50),
+                          painter: (PdfGraphics canvas, PdfPoint size) {
+                            canvas
+                              ..setColor(PdfColor.indigo)
+                              ..drawRRect(0, 0, size.x, size.y, 10, 10)
+                              ..fillPath();
+                          })),
+                  Positioned(
+                      left: 10,
+                      bottom: 10,
+                      child: RichText(
+                        text: TextSpan(
+                          text: 'Hello ',
+                          style: Theme.of(context).defaultTextStyle,
+                          children: <TextSpan>[
+                            TextSpan(
+                                text: 'bold',
+                                style: Theme.of(context)
+                                    .defaultTextStyleBold
+                                    .copyWith(
+                                        fontSize: 20, color: PdfColor.blue)),
+                            const TextSpan(
+                              text: ' world!',
+                            ),
+                          ],
+                        ),
+                      ))
+                ])));
+
     final File file = File('widgets.pdf');
-    file.writeAsBytesSync(pdf.document.save());
+    file.writeAsBytesSync(pdf.save());
   });
 }

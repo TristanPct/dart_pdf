@@ -1,7 +1,14 @@
 # 1.3.3
-* Fix dart lint warnings
+* Fix a bug with the RichText Widget
+* Update code to Dart 2.1.0
+* Add Document.save() method
 
 # 1.3.2
+* Fix dart lint warnings
+* Improve font bounds calculation
+* Add RichText Widget
+* Fix MultiPage max height
+* Add Stack Widget
 * Update Readme
 
 # 1.3.1

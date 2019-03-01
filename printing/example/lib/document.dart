@@ -108,7 +108,7 @@ Future<PdfDocument> generateDocument(PdfPageFormat format) async {
 
   final PdfImage profileImage = await pdfImageFromImageProvider(
       pdf: pdf.document,
-      image: fw.NetworkImage(
+      image: const fw.NetworkImage(
           'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&s=200'),
       onError: (dynamic exception, StackTrace stackTrace) {
         print('error');
@@ -131,7 +131,7 @@ Future<PdfDocument> generateDocument(PdfPageFormat format) async {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text('Parnella Charlesbois',
-                              textScaleFactor: 2.0,
+                              textScaleFactor: 2,
                               style: Theme.of(context).defaultTextStyleBold),
                           Padding(padding: const EdgeInsets.only(top: 10)),
                           Text('Electrotyper',

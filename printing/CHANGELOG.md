@@ -1,8 +1,21 @@
+# 2.0.0
+* Breaking change: Switch libraries to AndroidX
+
+# 1.3.5
+* Restore compatibility with Flutter 1.0.0
+* Update code to Dart 2.1.0
+* Depends on pdf 1.3.3
+
 # 1.3.4
-* Fix dart lint warnings
-* Add documentation
+* Fix iOS build with Swift
+* Add installation instructions in the Readme
+* Follow Flutter debug painting settings
 
 # 1.3.3
+* Fix dart lint warnings
+* Add documentation
+* Add a filename parameter for sharing
+* Convert Objective-C code to Swift
 * Update Readme
 
 # 1.3.2

@@ -41,6 +41,8 @@ class Document {
   void addPage(BasePage page) {
     page.generate(this);
   }
+
+  List<int> save() => document.save();
 }
 
 typedef BuildCallback = Widget Function(Context context);
@@ -67,10 +69,10 @@ class Page extends BasePage {
   void debugPaint(Context context) {
     context.canvas
       ..setFillColor(PdfColor.lightGreen)
-      ..moveTo(0.0, 0.0)
-      ..lineTo(pageFormat.width, 0.0)
+      ..moveTo(0, 0)
+      ..lineTo(pageFormat.width, 0)
       ..lineTo(pageFormat.width, pageFormat.height)
-      ..lineTo(0.0, pageFormat.height)
+      ..lineTo(0, pageFormat.height)
       ..moveTo(margin.left, margin.bottom)
       ..lineTo(margin.left, pageFormat.height - margin.top)
       ..lineTo(pageFormat.width - margin.right, pageFormat.height - margin.top)
@@ -85,8 +87,7 @@ class Page extends BasePage {
     final BoxConstraints constraints = BoxConstraints(
         maxWidth: pageFormat.width, maxHeight: pageFormat.height);
 
-    final Theme calculatedTheme =
-        theme ?? document.theme ?? Theme(document.document);
+    final Theme calculatedTheme = theme ?? document.theme ?? Theme.base();
     final Map<Type, Inherited> inherited = <Type, Inherited>{};
     inherited[calculatedTheme.runtimeType] = calculatedTheme;
     final Context context =
@@ -142,9 +143,10 @@ class MultiPage extends Page {
       this.crossAxisAlignment = CrossAxisAlignment.start,
       this.header,
       this.footer,
+      Theme theme,
       EdgeInsets margin})
       : _buildList = build,
-        super(pageFormat: pageFormat, margin: margin);
+        super(pageFormat: pageFormat, margin: margin, theme: theme);
 
   final BuildListCallback _buildList;
 
@@ -164,8 +166,7 @@ class MultiPage extends Page {
         maxWidth: pageFormat.width, maxHeight: pageFormat.height);
     final BoxConstraints childConstraints =
         BoxConstraints(maxWidth: constraints.maxWidth - margin.horizontal);
-    final Theme calculatedTheme =
-        theme ?? document.theme ?? Theme(document.document);
+    final Theme calculatedTheme = theme ?? document.theme ?? Theme.base();
     final Map<Type, Inherited> inherited = <Type, Inherited>{};
     inherited[calculatedTheme.runtimeType] = calculatedTheme;
     Context context;
@@ -227,13 +228,16 @@ class MultiPage extends Page {
       child.layout(context, childConstraints, parentUsesSize: false);
 
       if (offsetStart - child.box.height < offsetEnd) {
-        if (child.box.height < pageFormat.height - margin.vertical) {
+        if (child.box.height <= pageFormat.height - margin.vertical) {
           context = null;
           continue;
         }
 
         if (!(child is SpanningWidget)) {
-          throw Exception("Widget won't fit into the page");
+          throw Exception(
+              'Widget won\'t fit into the page as its height (${child.box.height}) '
+              'exceed a page height (${pageFormat.height - margin.vertical}). '
+              'You probably need a SpanningWidget or use a single page layout');
         }
 
         final SpanningWidget span = child;

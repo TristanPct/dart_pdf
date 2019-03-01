@@ -36,8 +36,7 @@ mixin Printing {
         final Map<String, dynamic> params = <String, dynamic>{
           'doc': Uint8List.fromList(bytes),
         };
-        await _channel.invokeMethod('writePdf', params);
-        return Future<void>.value();
+        return await _channel.invokeMethod('writePdf', params);
     }
   }
 
@@ -54,9 +53,9 @@ mixin Printing {
     };
 
     if (printer != null) {
-      await _channel.invokeMethod('directPrintPdf', params);
+      return await _channel.invokeMethod('directPrintPdf', params);
     } else {
-      await _channel.invokeMethod('printPdf', params);
+      return await _channel.invokeMethod('printPdf', params);
     }
   }
 
@@ -85,7 +84,10 @@ mixin Printing {
 
   /// Displays a platform popup to share the Pdf document to another application
   static Future<void> sharePdf(
-      {PdfDocument document, List<int> bytes, Rect bounds}) async {
+      {PdfDocument document,
+      List<int> bytes,
+      String filename,
+      Rect bounds}) async {
     assert(document != null || bytes != null);
     assert(!(document == null && bytes == null));
 
@@ -93,15 +95,20 @@ mixin Printing {
       bytes = document.save();
     }
 
-    bounds ??= Rect.fromCircle(center: Offset.zero, radius: 10.0);
+    bounds ??= Rect.fromCircle(center: Offset.zero, radius: 10);
 
     final Map<String, dynamic> params = <String, dynamic>{
       'doc': Uint8List.fromList(bytes),
+      'name': filename,
       'x': bounds.left,
       'y': bounds.top,
       'w': bounds.width,
       'h': bounds.height,
     };
+<<<<<<< HEAD
     await _channel.invokeMethod('sharePdf', params);
+=======
+    return await _channel.invokeMethod('sharePdf', params);
+>>>>>>> upstream/master
   }
 }

@@ -41,7 +41,7 @@ void main() {
                 child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
-                      Text('Portable Document Format', textScaleFactor: 2.0),
+                      Text('Portable Document Format', textScaleFactor: 2),
                       PdfLogo()
                     ])),
             Paragraph(
@@ -147,5 +147,5 @@ void main() {
           ]));
 
   final File file = File('example.pdf');
-  file.writeAsBytesSync(pdf.document.save());
+  file.writeAsBytesSync(pdf.save());
 }

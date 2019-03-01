@@ -15,14 +15,11 @@
  */
 
 #import "PrintingPlugin.h"
-#import "PageRenderer.h"
+#import <printing/printing-Swift.h>
 
-@implementation PrintingPlugin {
-  FlutterMethodChannel* channel;
-  PdfPrintPageRenderer* renderer;
-}
-
+@implementation PrintingPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
+<<<<<<< HEAD
   FlutterMethodChannel* channel =
       [FlutterMethodChannel methodChannelWithName:@"printing"
                                   binaryMessenger:[registrar messenger]];
@@ -212,4 +209,8 @@
                  completion:nil];
 }
 
+=======
+  [SwiftPrintingPlugin registerWithRegistrar:registrar];
+}
+>>>>>>> upstream/master
 @end
