@@ -114,7 +114,7 @@
   printInfo.jobName = name;
   printInfo.outputType = UIPrintInfoOutputGeneral;
   controller.printInfo = printInfo;
-  renderer = [[PdfPrintPageRenderer alloc] init:channel];
+  UIPrintPageRenderer* renderer = [[UIPrintPageRenderer alloc] init];
   [controller setPrintPageRenderer:renderer];
   UIPrintInteractionCompletionHandler completionHandler =
       ^(UIPrintInteractionController* printController, BOOL completed, NSError* error) {
