@@ -105,10 +105,6 @@ mixin Printing {
       'w': bounds.width,
       'h': bounds.height,
     };
-<<<<<<< HEAD
-    await _channel.invokeMethod('sharePdf', params);
-=======
     return await _channel.invokeMethod('sharePdf', params);
->>>>>>> upstream/master
   }
 }
