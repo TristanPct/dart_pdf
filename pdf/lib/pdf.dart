@@ -16,6 +16,7 @@
 
 library pdf;
 
+import 'dart:collection';
 import 'dart:convert';
 import 'dart:math' as math;
 import 'dart:typed_data';
@@ -30,6 +31,7 @@ part 'src/ascii85.dart';
 part 'src/border.dart';
 part 'src/catalog.dart';
 part 'src/color.dart';
+part 'src/colors.dart';
 part 'src/compatibility.dart';
 part 'src/document.dart';
 part 'src/font.dart';
@@ -39,6 +41,7 @@ part 'src/formxobject.dart';
 part 'src/graphics.dart';
 part 'src/image.dart';
 part 'src/info.dart';
+part 'src/names.dart';
 part 'src/object.dart';
 part 'src/object_stream.dart';
 part 'src/outline.dart';

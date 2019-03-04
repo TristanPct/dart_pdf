@@ -1,3 +1,16 @@
+# 1.3.5
+* Add some color functions
+* Remove color constants from PdfColor, use PdfColors
+
+# 1.3.4
+* Add available dimensions for PdfPageFormat
+* Add Document properties
+* Add Page.orientation to force landscape or portrait
+* Improve MultiPage Widget
+* Convert GridView to a SpanningWidget
+* Add all Material Colors
+* Add Hyperlink widgets
+
 # 1.3.3
 * Fix a bug with the RichText Widget
 * Update code to Dart 2.1.0

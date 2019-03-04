@@ -34,22 +34,22 @@ void printText(PdfGraphics canvas, String text, PdfFont font, double top) {
     ..setColor(const PdfColor(0.9, 0.9, 0.9))
     ..fillPath()
     ..drawLine(x + metrics.left - deb, y, x + metrics.right + deb, y)
-    ..setColor(PdfColor.blue)
+    ..setColor(PdfColors.blue)
     ..strokePath()
     ..drawLine(x + metrics.left - deb, y + metrics.ascent,
         x + metrics.right + deb, y + metrics.ascent)
-    ..setColor(PdfColor.green)
+    ..setColor(PdfColors.green)
     ..strokePath()
     ..drawLine(x + metrics.left - deb, y + metrics.descent,
         x + metrics.right + deb, y + metrics.descent)
-    ..setColor(PdfColor.purple)
+    ..setColor(PdfColors.purple)
     ..strokePath()
     ..setColor(const PdfColor(0.3, 0.3, 0.3))
     ..drawString(font, fontSize, text, x, y);
 }
 
 void main() {
-  test('Pdf', () {
+  test('Pdf Type1 Embedded Fonts', () {
     final PdfDocument pdf = PdfDocument();
     final PdfPage page =
         PdfPage(pdf, pageFormat: const PdfPageFormat(500, 430));

@@ -17,15 +17,22 @@
 part of pdf;
 
 class PdfColor {
-  const PdfColor(this.r, this.g, this.b, [this.a = 1.0]);
+  const PdfColor(this.red, this.green, this.blue, [this.alpha = 1.0])
+      : assert(red >= 0 && red <= 1),
+        assert(green >= 0 && green <= 1),
+        assert(blue >= 0 && blue <= 1),
+        assert(alpha >= 0 && alpha <= 1);
 
   const PdfColor.fromInt(int color)
-      : r = (color >> 16 & 0xff) / 255.0,
-        g = (color >> 8 & 0xff) / 255.0,
-        b = (color & 0xff) / 255.0,
-        a = (color >> 24 & 0xff) / 255.0;
+      : red = (color >> 16 & 0xff) / 255.0,
+        green = (color >> 8 & 0xff) / 255.0,
+        blue = (color & 0xff) / 255.0,
+        alpha = (color >> 24 & 0xff) / 255.0;
 
   factory PdfColor.fromHex(String color) {
+    if (color.startsWith('#')) {
+      color = color.substring(1);
+    }
     return PdfColor(
         (int.parse(color.substring(0, 1), radix: 16) >> 16 & 0xff) / 255.0,
         (int.parse(color.substring(2, 3), radix: 16) >> 8 & 0xff) / 255.0,
@@ -33,50 +40,30 @@ class PdfColor {
         (int.parse(color.substring(6, 7), radix: 16) >> 24 & 0xff) / 255.0);
   }
 
-  final double a;
-  final double r;
-  final double g;
-  final double b;
-
-  static const PdfColor black = PdfColor(0.0, 0.0, 0.0);
-  static const PdfColor white = PdfColor(1.0, 1.0, 1.0);
-  static const PdfColor red = PdfColor(0.95686, 0.26274, 0.21176);
-  static const PdfColor pink = PdfColor(0.91372, 0.11764, 0.38823);
-  static const PdfColor purple = PdfColor(0.91372, 0.11764, 0.38823);
-  static const PdfColor deepPurple = PdfColor(0.40392, 0.22745, 0.71765);
-  static const PdfColor indigo = PdfColor(0.24705, 0.31765, 0.70980);
-  static const PdfColor blue = PdfColor(0.12941, 0.58823, 0.95294);
-  static const PdfColor lightBlue = PdfColor(0.01176, 0.66274, 0.95686);
-  static const PdfColor cyan = PdfColor(0, 0.73725, 0.83137);
-  static const PdfColor teal = PdfColor(0, 0.58823, 0.53333);
-  static const PdfColor green = PdfColor(0.29803, 0.68627, 0.31372);
-  static const PdfColor lightGreen = PdfColor(0.54509, 0.76470, 0.29020);
-  static const PdfColor lime = PdfColor(0.80392, 0.86274, 0.22353);
-  static const PdfColor yellow = PdfColor(1, 0.92157, 0.23137);
-  static const PdfColor amber = PdfColor(1, 0.75686, 0.02745);
-  static const PdfColor orange = PdfColor(1, 0.59608, 0);
-  static const PdfColor deepOrange = PdfColor(1, 0.34118, 0.13333);
-  static const PdfColor brown = PdfColor(0.47451, 0.33333, 0.28235);
-  static const PdfColor grey = PdfColor(0.61961, 0.61961, 0.61961);
-  static const PdfColor blueGrey = PdfColor(0.37647, 0.49020, 0.54510);
+  final double alpha;
+  final double red;
+  final double green;
+  final double blue;
 
   int toInt() =>
-      ((((a * 255.0).round() & 0xff) << 24) |
-          (((r * 255.0).round() & 0xff) << 16) |
-          (((g * 255.0).round() & 0xff) << 8) |
-          (((b * 255.0).round() & 0xff) << 0)) &
+      ((((alpha * 255.0).round() & 0xff) << 24) |
+          (((red * 255.0).round() & 0xff) << 16) |
+          (((green * 255.0).round() & 0xff) << 8) |
+          (((blue * 255.0).round() & 0xff) << 0)) &
       0xFFFFFFFF;
 
+  String toHex() => '#' + toInt().toRadixString(16);
+
   PdfColorCmyk toCmyk() {
-    return PdfColorCmyk.fromRgb(r, g, b, a);
+    return PdfColorCmyk.fromRgb(red, green, blue, alpha);
   }
 
   PdfColorHsv toHsv() {
-    return PdfColorHsv.fromRgb(r, g, b, a);
+    return PdfColorHsv.fromRgb(red, green, blue, alpha);
   }
 
   PdfColorHsl toHsl() {
-    return PdfColorHsl.fromRgb(r, g, b, a);
+    return PdfColorHsl.fromRgb(red, green, blue, alpha);
   }
 
   static double _linearizeColorComponent(double component) {
@@ -87,35 +74,50 @@ class PdfColor {
   }
 
   double get luminance {
-    final double R = _linearizeColorComponent(r);
-    final double G = _linearizeColorComponent(g);
-    final double B = _linearizeColorComponent(b);
+    final double R = _linearizeColorComponent(red);
+    final double G = _linearizeColorComponent(green);
+    final double B = _linearizeColorComponent(blue);
     return 0.2126 * R + 0.7152 * G + 0.0722 * B;
   }
 
+  /// Get a complementary color with hue shifted by -120°
+  PdfColor get complementary => toHsv().complementary;
+
+  /// Get some similar colors
+  List<PdfColor> get monochromatic => toHsv().monochromatic;
+
+  List<PdfColor> get splitcomplementary => toHsv().splitcomplementary;
+
+  List<PdfColor> get tetradic => toHsv().tetradic;
+
+  List<PdfColor> get triadic => toHsv().triadic;
+
+  List<PdfColor> get analagous => toHsv().analagous;
+
   @override
-  String toString() => '$runtimeType($r, $g, $b, $a)';
+  String toString() => '$runtimeType($red, $green, $blue, $alpha)';
 }
 
 class PdfColorCmyk extends PdfColor {
-  const PdfColorCmyk(this.c, this.m, this.y, this.k, [double a = 1.0])
-      : super((1.0 - c) * (1.0 - k), (1.0 - m) * (1.0 - k),
-            (1.0 - y) * (1.0 - k), a);
+  const PdfColorCmyk(this.cyan, this.magenta, this.yellow, this.black,
+      [double a = 1.0])
+      : super((1.0 - cyan) * (1.0 - black), (1.0 - magenta) * (1.0 - black),
+            (1.0 - yellow) * (1.0 - black), a);
 
   const PdfColorCmyk.fromRgb(double r, double g, double b, [double a = 1.0])
-      : k = 1.0 - r > g ? r : g > b ? r > g ? r : g : b,
-        c = (1.0 - r - (1.0 - r > g ? r : g > b ? r > g ? r : g : b)) /
+      : black = 1.0 - r > g ? r : g > b ? r > g ? r : g : b,
+        cyan = (1.0 - r - (1.0 - r > g ? r : g > b ? r > g ? r : g : b)) /
             (1.0 - (1.0 - r > g ? r : g > b ? r > g ? r : g : b)),
-        m = (1.0 - g - (1.0 - r > g ? r : g > b ? r > g ? r : g : b)) /
+        magenta = (1.0 - g - (1.0 - r > g ? r : g > b ? r > g ? r : g : b)) /
             (1.0 - (1.0 - r > g ? r : g > b ? r > g ? r : g : b)),
-        y = (1.0 - b - (1.0 - r > g ? r : g > b ? r > g ? r : g : b)) /
+        yellow = (1.0 - b - (1.0 - r > g ? r : g > b ? r > g ? r : g : b)) /
             (1.0 - (1.0 - r > g ? r : g > b ? r > g ? r : g : b)),
         super(r, g, b, a);
 
-  final double c;
-  final double m;
-  final double y;
-  final double k;
+  final double cyan;
+  final double magenta;
+  final double yellow;
+  final double black;
 
   @override
   PdfColorCmyk toCmyk() {
@@ -123,7 +125,7 @@ class PdfColorCmyk extends PdfColor {
   }
 
   @override
-  String toString() => '$runtimeType($c, $m, $y, $k, $a)';
+  String toString() => '$runtimeType($cyan, $magenta, $yellow, $black, $alpha)';
 }
 
 double _getHue(
@@ -144,6 +146,9 @@ double _getHue(
   return hue;
 }
 
+/// Same as HSB, Cylindrical geometries with hue, their angular dimension,
+/// starting at the red primary at 0°, passing through the green primary
+/// at 120° and the blue primary at 240°, and then wrapping back to red at 360°
 class PdfColorHsv extends PdfColor {
   factory PdfColorHsv(double hue, double saturation, double value,
       [double alpha = 1.0]) {
@@ -187,7 +192,10 @@ class PdfColorHsv extends PdfColor {
 
   const PdfColorHsv._(this.hue, this.saturation, this.value, double red,
       double green, double blue, double alpha)
-      : super(red, green, blue, alpha);
+      : assert(hue >= 0 && hue < 360),
+        assert(saturation >= 0 && saturation <= 1),
+        assert(value >= 0 && value <= 1),
+        super(red, green, blue, alpha);
 
   factory PdfColorHsv.fromRgb(double red, double green, double blue,
       [double alpha]) {
@@ -201,8 +209,13 @@ class PdfColorHsv extends PdfColor {
     return PdfColorHsv._(hue, saturation, max, red, green, blue, alpha);
   }
 
+  /// Angular position the colorspace coordinate diagram in degrees from 0° to 360°
   final double hue;
+
+  /// Saturation of the color
   final double saturation;
+
+  /// Brightness
   final double value;
 
   @override
@@ -210,8 +223,59 @@ class PdfColorHsv extends PdfColor {
     return this;
   }
 
+  /// Get a complementary color with hue shifted by -120°
   @override
-  String toString() => '$runtimeType($hue, $saturation, $value, $a)';
+  PdfColorHsv get complementary =>
+      PdfColorHsv((hue - 120) % 360, saturation, value, alpha);
+
+  /// Get a similar color
+  @override
+  List<PdfColorHsv> get monochromatic => <PdfColorHsv>[
+        PdfColorHsv(
+            hue,
+            (saturation > 0.5 ? saturation - 0.2 : saturation + 0.2)
+                .clamp(0, 1),
+            (value > 0.5 ? value - 0.1 : value + 0.1).clamp(0, 1)),
+        PdfColorHsv(
+            hue,
+            (saturation > 0.5 ? saturation - 0.4 : saturation + 0.4)
+                .clamp(0, 1),
+            (value > 0.5 ? value - 0.2 : value + 0.2).clamp(0, 1)),
+        PdfColorHsv(
+            hue,
+            (saturation > 0.5 ? saturation - 0.15 : saturation + 0.15)
+                .clamp(0, 1),
+            (value > 0.5 ? value - 0.05 : value + 0.05).clamp(0, 1))
+      ];
+
+  /// Get two complementary colors with hue shifted by -120°
+  @override
+  List<PdfColorHsv> get splitcomplementary => <PdfColorHsv>[
+        PdfColorHsv((hue - 150) % 360, saturation, value, alpha),
+        PdfColorHsv((hue - 180) % 360, saturation, value, alpha),
+      ];
+
+  @override
+  List<PdfColorHsv> get triadic => <PdfColorHsv>[
+        PdfColorHsv((hue + 80) % 360, saturation, value, alpha),
+        PdfColorHsv((hue - 120) % 360, saturation, value, alpha),
+      ];
+
+  @override
+  List<PdfColorHsv> get tetradic => <PdfColorHsv>[
+        PdfColorHsv((hue + 120) % 360, saturation, value, alpha),
+        PdfColorHsv((hue - 150) % 360, saturation, value, alpha),
+        PdfColorHsv((hue + 60) % 360, saturation, value, alpha),
+      ];
+
+  @override
+  List<PdfColorHsv> get analagous => <PdfColorHsv>[
+        PdfColorHsv((hue + 30) % 360, saturation, value, alpha),
+        PdfColorHsv((hue - 20) % 360, saturation, value, alpha),
+      ];
+
+  @override
+  String toString() => '$runtimeType($hue, $saturation, $value, $alpha)';
 }
 
 class PdfColorHsl extends PdfColor {
@@ -283,5 +347,5 @@ class PdfColorHsl extends PdfColor {
   }
 
   @override
-  String toString() => '$runtimeType($hue, $saturation, $lightness, $a)';
+  String toString() => '$runtimeType($hue, $saturation, $lightness, $alpha)';
 }

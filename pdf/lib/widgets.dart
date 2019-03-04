@@ -23,6 +23,7 @@ import 'package:meta/meta.dart';
 import 'package:pdf/pdf.dart';
 import 'package:vector_math/vector_math_64.dart';
 
+part 'widgets/annotations.dart';
 part 'widgets/basic.dart';
 part 'widgets/clip.dart';
 part 'widgets/container.dart';
@@ -33,6 +34,7 @@ part 'widgets/font.dart';
 part 'widgets/geometry.dart';
 part 'widgets/grid_view.dart';
 part 'widgets/image.dart';
+part 'widgets/multi_page.dart';
 part 'widgets/placeholders.dart';
 part 'widgets/stack.dart';
 part 'widgets/table.dart';

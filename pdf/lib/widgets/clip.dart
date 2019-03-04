@@ -22,19 +22,14 @@ class ClipRect extends SingleChildWidget {
   @override
   void debugPaint(Context context) {
     context.canvas
-      ..setStrokeColor(PdfColor.deepPurple)
+      ..setStrokeColor(PdfColors.deepPurple)
       ..drawRect(box.x, box.y, box.width, box.height)
       ..strokePath();
   }
 
   @override
   void paint(Context context) {
-    assert(() {
-      if (Document.debug) {
-        debugPaint(context);
-      }
-      return true;
-    }());
+    super.paint(context);
 
     if (child != null) {
       final Matrix4 mat = Matrix4.identity();
@@ -63,7 +58,7 @@ class ClipRRect extends SingleChildWidget {
   @override
   void debugPaint(Context context) {
     context.canvas
-      ..setStrokeColor(PdfColor.deepPurple)
+      ..setStrokeColor(PdfColors.deepPurple)
       ..drawRRect(
           box.x, box.y, box.width, box.height, horizontalRadius, verticalRadius)
       ..strokePath();
@@ -71,12 +66,7 @@ class ClipRRect extends SingleChildWidget {
 
   @override
   void paint(Context context) {
-    assert(() {
-      if (Document.debug) {
-        debugPaint(context);
-      }
-      return true;
-    }());
+    super.paint(context);
 
     if (child != null) {
       final Matrix4 mat = Matrix4.identity();
@@ -102,19 +92,14 @@ class ClipOval extends SingleChildWidget {
     final double ry = box.height / 2.0;
 
     context.canvas
-      ..setStrokeColor(PdfColor.deepPurple)
+      ..setStrokeColor(PdfColors.deepPurple)
       ..drawEllipse(box.x + rx, box.y + ry, rx, ry)
       ..strokePath();
   }
 
   @override
   void paint(Context context) {
-    assert(() {
-      if (Document.debug) {
-        debugPaint(context);
-      }
-      return true;
-    }());
+    super.paint(context);
 
     final double rx = box.width / 2.0;
     final double ry = box.height / 2.0;

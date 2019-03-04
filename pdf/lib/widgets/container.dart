@@ -25,7 +25,7 @@ class BoxBorder {
       this.top = false,
       this.right = false,
       this.bottom = false,
-      this.color = PdfColor.black,
+      this.color = PdfColors.black,
       this.width = 1.0})
       : assert(color != null),
         assert(width != null),
@@ -147,11 +147,12 @@ class DecoratedBox extends SingleChildWidget {
 
   @override
   void paint(Context context) {
+    super.paint(context);
     if (position == DecorationPosition.background) {
       decoration.paintBackground(context, box);
       decoration.border?.paintBorders(context, box);
     }
-    super.paint(context);
+    paintChild(context);
     if (position == DecorationPosition.foreground) {
       decoration.paintBackground(context, box);
       decoration.border?.paintBorders(context, box);

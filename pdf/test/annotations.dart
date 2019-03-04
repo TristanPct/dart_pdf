@@ -20,7 +20,7 @@ import 'package:pdf/pdf.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('Pdf', () {
+  test('Pdf Annotations', () {
     final PdfDocument pdf = PdfDocument();
     final PdfPage page =
         PdfPage(pdf, pageFormat: const PdfPageFormat(500, 300));
@@ -34,6 +34,12 @@ void main() {
 
     PdfAnnot.link(page, dest: page1, srcRect: const PdfRect(100, 150, 50, 50));
     g.drawRect(100, 150, 50, 50);
+    g.strokePath();
+
+    PdfAnnot.urlLink(page,
+        rect: const PdfRect(100, 250, 50, 50),
+        dest: 'https://github.com/DavBfr/dart_pdf/');
+    g.drawRect(100, 250, 50, 50);
     g.strokePath();
 
     final File file = File('annotations.pdf');

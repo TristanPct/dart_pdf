@@ -44,6 +44,12 @@ class Positioned extends SingleChildWidget {
   double get width => box?.width;
 
   double get height => box?.height;
+
+  @override
+  void paint(Context context) {
+    super.paint(context);
+    paintChild(context);
+  }
 }
 
 /// A widget that positions its children relative to the edges of its box.
@@ -100,6 +106,7 @@ class Stack extends MultiChildWidget {
         hasNonPositionedChildren = true;
 
         child.layout(context, nonPositionedConstraints, parentUsesSize: true);
+        assert(child.box != null);
 
         final PdfRect childSize = child.box;
         width = math.max(width, childSize.width);
@@ -137,6 +144,7 @@ class Stack extends MultiChildWidget {
               childConstraints.tighten(height: positioned.height);
 
         positioned.layout(context, childConstraints, parentUsesSize: true);
+        assert(positioned.box != null);
 
         double x;
         if (positioned.left != null) {

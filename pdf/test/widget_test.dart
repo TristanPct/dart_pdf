@@ -22,10 +22,10 @@ import 'package:pdf/widgets.dart';
 import 'package:test/test.dart';
 
 void main() {
-  test('Pdf', () {
+  test('Pdf Widgets', () {
     Document.debug = true;
 
-    final Document pdf = Document();
+    final Document pdf = Document(title: 'Widgets Test');
 
     final TextStyle symbol = TextStyle(font: Font.zapfDingbats());
 
@@ -42,7 +42,7 @@ void main() {
                   padding: const EdgeInsets.all(5),
                   margin: const EdgeInsets.only(bottom: 10),
                   decoration: const BoxDecoration(
-                      color: PdfColor.amber,
+                      color: PdfColors.amber,
                       border: BoxBorder(
                           top: true,
                           bottom: true,
@@ -51,7 +51,10 @@ void main() {
                           width: 2)),
                   child: Text('Hello World',
                       textScaleFactor: 2, textAlign: TextAlign.center)),
-              Align(alignment: Alignment.topLeft, child: Text('Left align')),
+              Align(
+                  alignment: Alignment.topLeft,
+                  child:
+                      Link(destination: 'anchor', child: Text('Left align'))),
               Padding(padding: const EdgeInsets.all(5)),
               Row(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -133,6 +136,7 @@ void main() {
                 <String>['York Steak House', 'Outi Vuorinen', 'Finland'],
                 <String>['Weathervane', 'Else Jeremiassen', 'Iceland'],
               ]),
+              Anchor(name: 'anchor', child: Text('Anchor')),
             ]));
 
     pdf.addPage(Page(
@@ -149,7 +153,7 @@ void main() {
                           size: const PdfPoint(50, 50),
                           painter: (PdfGraphics canvas, PdfPoint size) {
                             canvas
-                              ..setColor(PdfColor.indigo)
+                              ..setColor(PdfColors.indigo)
                               ..drawRRect(0, 0, size.x, size.y, 10, 10)
                               ..fillPath();
                           })),
@@ -166,13 +170,19 @@ void main() {
                                 style: Theme.of(context)
                                     .defaultTextStyleBold
                                     .copyWith(
-                                        fontSize: 20, color: PdfColor.blue)),
+                                        fontSize: 20, color: PdfColors.blue)),
                             const TextSpan(
                               text: ' world!',
                             ),
                           ],
                         ),
-                      ))
+                      )),
+                  Positioned(
+                      right: 10,
+                      bottom: 10,
+                      child: UrlLink(
+                          child: Text('dart_pdf'),
+                          destination: 'https://github.com/DavBfr/dart_pdf/'))
                 ])));
 
     final File file = File('widgets.pdf');

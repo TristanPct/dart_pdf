@@ -39,6 +39,8 @@ class PdfPageFormat {
   static const PdfPageFormat legal =
       PdfPageFormat(8.5 * inch, 14.0 * inch, marginAll: inch);
 
+  static const PdfPageFormat standard = a4;
+
   static const double point = 1.0;
   static const double inch = 72.0;
   static const double cm = inch / 2.54;
@@ -66,7 +68,17 @@ class PdfPageFormat {
         marginRight: marginRight ?? this.marginRight);
   }
 
+  /// Total page dimensions
   PdfPoint get dimension => PdfPoint(width, height);
+
+  /// Total page width excluding margins
+  double get availableWidth => width - marginLeft - marginRight;
+
+  /// Total page height excluding margins
+  double get availableHeight => height - marginTop - marginBottom;
+
+  /// Total page dimensions excluding margins
+  PdfPoint get availableDimension => PdfPoint(availableWidth, availableHeight);
 
   PdfPageFormat get landscape =>
       width >= height ? this : copyWith(width: height, height: width);
@@ -85,6 +97,6 @@ class PdfPageFormat {
 
   @override
   String toString() {
-    return '${width}x$height';
+    return 'Page ${width}x$height margins:$marginLeft, $marginTop, $marginRight, $marginBottom';
   }
 }

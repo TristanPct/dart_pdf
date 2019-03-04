@@ -50,11 +50,18 @@ class LimitedBox extends SingleChildWidget {
     if (child != null) {
       child.layout(context, _limitConstraints(constraints),
           parentUsesSize: true);
+      assert(child.box != null);
       size = constraints.constrain(child.box.size);
     } else {
       size = _limitConstraints(constraints).constrain(PdfPoint.zero);
     }
     box = PdfRect.fromPoints(PdfPoint.zero, size);
+  }
+
+  @override
+  void paint(Context context) {
+    super.paint(context);
+    paintChild(context);
   }
 }
 
@@ -73,6 +80,7 @@ class Padding extends SingleChildWidget {
     if (child != null) {
       final BoxConstraints childConstraints = constraints.deflate(padding);
       child.layout(context, childConstraints, parentUsesSize: parentUsesSize);
+      assert(child.box != null);
       box = constraints.constrainRect(
           width: child.box.width + padding.horizontal,
           height: child.box.height + padding.vertical);
@@ -85,7 +93,7 @@ class Padding extends SingleChildWidget {
   @override
   void debugPaint(Context context) {
     context.canvas
-      ..setFillColor(PdfColor.lime)
+      ..setFillColor(PdfColors.lime)
       ..moveTo(box.x, box.y)
       ..lineTo(box.right, box.y)
       ..lineTo(box.right, box.top)
@@ -99,12 +107,7 @@ class Padding extends SingleChildWidget {
 
   @override
   void paint(Context context) {
-    assert(() {
-      if (Document.debug) {
-        debugPaint(context);
-      }
-      return true;
-    }());
+    super.paint(context);
 
     if (child != null) {
       final Matrix4 mat = Matrix4.identity();
@@ -189,12 +192,7 @@ class Transform extends SingleChildWidget {
 
   @override
   void paint(Context context) {
-    assert(() {
-      if (Document.debug) {
-        debugPaint(context);
-      }
-      return true;
-    }());
+    super.paint(context);
 
     if (child != null) {
       final Matrix4 mat = _effectiveTransform;
@@ -239,6 +237,7 @@ class Align extends SingleChildWidget {
 
     if (child != null) {
       child.layout(context, constraints.loosen(), parentUsesSize: true);
+      assert(child.box != null);
 
       box = constraints.constrainRect(
           width: shrinkWrapWidth
@@ -254,6 +253,12 @@ class Align extends SingleChildWidget {
           width: shrinkWrapWidth ? 0.0 : double.infinity,
           height: shrinkWrapHeight ? 0.0 : double.infinity);
     }
+  }
+
+  @override
+  void paint(Context context) {
+    super.paint(context);
+    paintChild(context);
   }
 }
 
@@ -272,11 +277,18 @@ class ConstrainedBox extends SingleChildWidget {
     if (child != null) {
       child.layout(context, this.constraints.enforce(constraints),
           parentUsesSize: true);
+      assert(child.box != null);
       box = child.box;
     } else {
       box = PdfRect.fromPoints(PdfPoint.zero,
           this.constraints.enforce(constraints).constrain(PdfPoint.zero));
     }
+  }
+
+  @override
+  void paint(Context context) {
+    super.paint(context);
+    paintChild(context);
   }
 }
 
@@ -308,6 +320,7 @@ class FittedBox extends SingleChildWidget {
     PdfPoint size;
     if (child != null) {
       child.layout(context, const BoxConstraints(), parentUsesSize: true);
+      assert(child.box != null);
       size = constraints
           .constrainSizeAndAttemptToPreserveAspectRatio(child.box.size);
     } else {
@@ -318,6 +331,8 @@ class FittedBox extends SingleChildWidget {
 
   @override
   void paint(Context context) {
+    super.paint(context);
+
     if (child != null) {
       final PdfPoint childSize = child.box.size;
       final FittedSizes sizes = applyBoxFit(fit, childSize, box.size);
@@ -397,6 +412,13 @@ class AspectRatio extends SingleChildWidget {
     if (child != null)
       child.layout(context,
           BoxConstraints.tightFor(width: box.width, height: box.height));
+    assert(child.box != null);
+  }
+
+  @override
+  void paint(Context context) {
+    super.paint(context);
+    paintChild(context);
   }
 }
 
@@ -420,6 +442,7 @@ class CustomPaint extends SingleChildWidget {
     if (child != null) {
       child.layout(context, constraints.tighten(width: size.x, height: size.y),
           parentUsesSize: parentUsesSize);
+      assert(child.box != null);
       box = child.box;
     } else {
       box = PdfRect.fromPoints(PdfPoint.zero, constraints.constrain(size));
@@ -428,12 +451,7 @@ class CustomPaint extends SingleChildWidget {
 
   @override
   void paint(Context context) {
-    assert(() {
-      if (Document.debug) {
-        debugPaint(context);
-      }
-      return true;
-    }());
+    super.paint(context);
 
     final Matrix4 mat = Matrix4.identity();
     mat.translate(box.x, box.y);

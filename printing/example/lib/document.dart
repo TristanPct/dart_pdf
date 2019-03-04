@@ -104,14 +104,14 @@ class Category extends StatelessWidget {
 }
 
 Future<PdfDocument> generateDocument(PdfPageFormat format) async {
-  final PdfDoc pdf = PdfDoc();
+  final PdfDoc pdf = PdfDoc(title: 'My Résumé', author: 'David PHAM-VAN');
 
   final PdfImage profileImage = await pdfImageFromImageProvider(
       pdf: pdf.document,
       image: const fw.NetworkImage(
           'https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&s=200'),
       onError: (dynamic exception, StackTrace stackTrace) {
-        print('error');
+        print('Unable to download image');
       });
 
   pdf.addPage(MyPage(

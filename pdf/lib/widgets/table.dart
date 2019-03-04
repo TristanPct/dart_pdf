@@ -40,7 +40,7 @@ class TableBorder extends BoxBorder {
       bool bottom = true,
       this.horizontalInside = true,
       this.verticalInside = true,
-      PdfColor color = PdfColor.black,
+      PdfColor color = PdfColors.black,
       double width = 1.0})
       : super(
             left: left,
@@ -163,6 +163,7 @@ class Table extends Widget implements SpanningWidget {
       int n = 0;
       for (Widget child in row.children) {
         child.layout(context, const BoxConstraints());
+        assert(child.box != null);
         final double calculatedWidth =
             child.box.width == double.infinity ? 0.0 : child.box.width;
         final double childFlex = child is Expanded
@@ -227,6 +228,7 @@ class Table extends Widget implements SpanningWidget {
         final BoxConstraints childConstraints =
             BoxConstraints.tightFor(width: _widths[n]);
         child.layout(context, childConstraints);
+        assert(child.box != null);
         child.box = PdfRect(x, totalHeight, child.box.width, child.box.height);
         x += _widths[n];
         lineHeight = math.max(lineHeight, child.box.height);
