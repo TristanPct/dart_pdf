@@ -52,11 +52,7 @@ mixin Printing {
       'printer': printer
     };
 
-    if (printer != null) {
-      return await _channel.invokeMethod('directPrintPdf', params);
-    } else {
-      return await _channel.invokeMethod('printPdf', params);
-    }
+    return await _channel.invokeMethod('printPdf', params);
   }
 
   /// Opens the native printer picker interface, and returns the URL of the selected printer.

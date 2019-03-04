@@ -33,10 +33,10 @@ public class SwiftPrintingPlugin: NSObject, FlutterPlugin, UIPrintInteractionCon
         registrar.addMethodCallDelegate(instance, channel: channel)
     }
 
-    public func handle(_ call: FlutterMethodCall, result: FlutterResult) {
+    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let args = call.arguments! as! [String: Any]
         if "printPdf" == call.method {
-            printPdf(args["name"] as? String ?? "")
+            printPdf(args["name"] as? String ?? "", withPrinter: args["printer"] as? String)
             result(NSNumber(value: 1))
         } else if "writePdf" == call.method {
             if let object = args["doc"] as? FlutterStandardTypedData {
@@ -52,6 +52,9 @@ public class SwiftPrintingPlugin: NSObject, FlutterPlugin, UIPrintInteractionCon
                 )
             }
             result(NSNumber(value: 1))
+        } else if "pickPrinter" == call.method {
+            pickPrinter(result,
+                        withSourceRect: CGRect(x: CGFloat((args["x"] as? NSNumber)?.floatValue ?? 0.0), y: CGFloat((args["y"] as? NSNumber)?.floatValue ?? 0.0), width: CGFloat((args["w"] as? NSNumber)?.floatValue ?? 0.0), height: CGFloat((args["h"] as? NSNumber)?.floatValue ?? 0.0)))
         } else {
             result(FlutterMethodNotImplemented)
         }
@@ -64,7 +67,7 @@ public class SwiftPrintingPlugin: NSObject, FlutterPlugin, UIPrintInteractionCon
         renderer = nil
     }
 
-    func printPdf(_ name: String) {
+    func printPdf(_ name: String, withPrinter printerID: String?) {
         let printing = UIPrintInteractionController.isPrintingAvailable
         if !printing {
             print("printing not available")
@@ -80,6 +83,17 @@ public class SwiftPrintingPlugin: NSObject, FlutterPlugin, UIPrintInteractionCon
         controller.printInfo = printInfo
         renderer = PdfPrintPageRenderer(channel)
         controller.printPageRenderer = renderer
+        
+        // Direct print if printerID is non null and valid.
+        if !(printerID ?? "").isEmpty {
+            let printerURL = URL(string: printerID!)
+            if printerURL != nil {
+                let printer = UIPrinter(url: printerURL!)
+                controller.print(to: printer, completionHandler: completionHandler)
+                return
+            }
+        }
+        
         controller.present(animated: true, completionHandler: completionHandler)
     }
 
@@ -117,5 +131,26 @@ public class SwiftPrintingPlugin: NSObject, FlutterPlugin, UIPrintInteractionCon
             activityViewController.popoverPresentationController?.sourceRect = rect
         }
         UIApplication.shared.keyWindow?.rootViewController?.present(activityViewController, animated: true)
+    }
+    
+    func pickPrinter(_ result: @escaping FlutterResult, withSourceRect rect: CGRect) {
+        let controller = UIPrinterPickerController.init(initiallySelectedPrinter: nil)
+        
+        let pickPrinterCompletionHandler: UIPrinterPickerController.CompletionHandler = { (printerPickerController: UIPrinterPickerController, completed: Bool, error: Error?) in
+            if !completed, error != nil {
+                print("Unable to pick printer: \(error?.localizedDescription ?? "unknown error")")
+            }
+            result(printerPickerController.selectedPrinter?.url.absoluteString)
+        }
+        
+        if UI_USER_INTERFACE_IDIOM() == .pad {
+            let viewController: UIViewController? = UIApplication.shared.keyWindow?.rootViewController
+            if viewController != nil {
+                controller.present(from: rect, in: viewController!.view, animated: true, completionHandler: pickPrinterCompletionHandler)
+                return
+            }
+        }
+        
+        controller.present(animated: true, completionHandler: pickPrinterCompletionHandler)
     }
 }
