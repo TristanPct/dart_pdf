@@ -23,8 +23,10 @@ mixin Printing {
   static LayoutCallback _onLayout;
 
   static Future<void> _handleMethod(MethodCall call) async {
+    print('_handleMethod ' + call.method);
     switch (call.method) {
       case 'onLayout':
+        print('await _onLayout ' + _onLayout.toString());
         final List<int> bytes = await _onLayout(PdfPageFormat(
           call.arguments['width'],
           call.arguments['height'],
@@ -33,9 +35,11 @@ mixin Printing {
           marginRight: call.arguments['marginRight'],
           marginBottom: call.arguments['marginBottom'],
         ));
+        print('_onLayout done');
         final Map<String, dynamic> params = <String, dynamic>{
           'doc': Uint8List.fromList(bytes),
         };
+        print("await _channel.invokeMethod 'writePdf'");
         return await _channel.invokeMethod('writePdf', params);
     }
   }

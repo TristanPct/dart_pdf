@@ -20,11 +20,13 @@ import UIKit
 public class SwiftPrintingPlugin: NSObject, FlutterPlugin, UIPrintInteractionControllerDelegate {
     private var channel: FlutterMethodChannel?
     private var renderer: PdfPrintPageRenderer?
+    private var lock: NSLock?
 
     init(_ channel: FlutterMethodChannel?) {
         super.init()
         self.channel = channel
         renderer = nil
+        lock = NSLock()
     }
 
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -89,7 +91,12 @@ public class SwiftPrintingPlugin: NSObject, FlutterPlugin, UIPrintInteractionCon
             let printerURL = URL(string: printerID!)
             if printerURL != nil {
                 let printer = UIPrinter(url: printerURL!)
-                controller.print(to: printer, completionHandler: completionHandler)
+//                let queue = DispatchQueue.global()
+//                queue.async {
+                    self.renderer?.layout()
+                    controller.print(to: printer, completionHandler: self.completionHandler)
+//                }
+                
                 return
             }
         }

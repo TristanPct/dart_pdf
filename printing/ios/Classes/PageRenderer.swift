@@ -48,6 +48,13 @@ class PdfPrintPageRenderer: UIPrintPageRenderer {
         lock?.unlock()
     }
 
+    func layout() {
+        lock?.lock()
+        channel?.invokeMethod("onLayout", arguments: pageArgs)
+//        lock?.lock()
+//        lock?.unlock()
+    }
+    
     override var numberOfPages: Int {
         let width = NSNumber(value: Double(paperRect.size.width))
         let height = NSNumber(value: Double(paperRect.size.height))
@@ -73,5 +80,23 @@ class PdfPrintPageRenderer: UIPrintPageRenderer {
         let pages = pdfDocument?.numberOfPages ?? 0
 
         return pages
+    }
+    
+    var pageArgs: [String: NSNumber] {
+        let width = NSNumber(value: Double(paperRect.size.width))
+        let height = NSNumber(value: Double(paperRect.size.height))
+        let marginLeft = NSNumber(value: Double(printableRect.origin.x))
+        let marginTop = NSNumber(value: Double(printableRect.origin.y))
+        let marginRight = NSNumber(value: Double(paperRect.size.width - (printableRect.origin.x + printableRect.size.width)))
+        let marginBottom = NSNumber(value: Double(paperRect.size.height - (printableRect.origin.y + printableRect.size.height)))
+        
+        return [
+            "width": width,
+            "height": height,
+            "marginLeft": marginLeft,
+            "marginTop": marginTop,
+            "marginRight": marginRight,
+            "marginBottom": marginBottom,
+        ]
     }
 }
