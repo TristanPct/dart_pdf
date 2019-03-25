@@ -51,8 +51,8 @@ class PdfPrintPageRenderer: UIPrintPageRenderer {
     func layout() {
         lock?.lock()
         channel?.invokeMethod("onLayout", arguments: pageArgs)
-//        lock?.lock()
-//        lock?.unlock()
+        lock?.lock()
+        lock?.unlock()
     }
     
     override var numberOfPages: Int {

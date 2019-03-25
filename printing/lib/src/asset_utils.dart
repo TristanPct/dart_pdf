@@ -41,15 +41,19 @@ Future<PdfImage> pdfImageFromImageProvider(
       image.resolve(configuration ?? ImageConfiguration.empty);
 
   Future<void> listener(ImageInfo image, bool sync) async {
+    print('pdfImageFromImageProvider[listener]');
     final PdfImage result =
         await pdfImageFromImage(pdf: pdf, image: image.image);
+    print('pdfImageFromImageProvider[listener] pdfImageFromImage done ${completer.isCompleted}');
     if (!completer.isCompleted) {
       completer.complete(result);
     }
     stream.removeListener(listener);
+    print('pdfImageFromImageProvider[listener] done');
   }
 
   void errorListener(dynamic exception, StackTrace stackTrace) {
+    print('pdfImageFromImageProvider[errorListener] ${completer.isCompleted} $exception');
     if (!completer.isCompleted) {
       completer.complete(null);
     }

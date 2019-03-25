@@ -104,6 +104,7 @@ class Category extends StatelessWidget {
 }
 
 Future<PdfDocument> generateDocument(PdfPageFormat format) async {
+  print('generateDocument');
   final PdfDoc pdf = PdfDoc(title: 'My Résumé', author: 'David PHAM-VAN');
 
   final PdfImage profileImage = await pdfImageFromImageProvider(
@@ -113,6 +114,10 @@ Future<PdfDocument> generateDocument(PdfPageFormat format) async {
       onError: (dynamic exception, StackTrace stackTrace) {
         print('Unable to download image');
       });
+
+  print('generateDocument pdfImageFromImageProvider done');
+
+  try {
 
   pdf.addPage(MyPage(
     pageFormat: format.applyMargin(
@@ -191,5 +196,10 @@ Future<PdfDocument> generateDocument(PdfPageFormat format) async {
               ])
         ]),
   ));
+
+  } on Exception catch (e) {
+    print('generateDocument error $e');
+  }
+  print('generateDocument done');
   return pdf.document;
 }
