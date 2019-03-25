@@ -91,7 +91,7 @@ public class SwiftPrintingPlugin: NSObject, FlutterPlugin, UIPrintInteractionCon
             let printerURL = URL(string: printerID!)
             if printerURL != nil {
                 let printer = UIPrinter(url: printerURL!)
-                self.renderer?.layout()
+//                self.renderer?.layout()
                 controller.print(to: printer, completionHandler: self.completionHandler)
                 
                 return

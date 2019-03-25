@@ -37,7 +37,9 @@ class PdfPrintPageRenderer: UIPrintPageRenderer {
         let page = pdfDocument?.page(at: pageIndex + 1)
         ctx?.scaleBy(x: 1.0, y: -1.0)
         ctx?.translateBy(x: 0.0, y: -paperRect.size.height)
-        ctx?.drawPDFPage(page!)
+        if page != nil {
+            ctx?.drawPDFPage(page!)
+        }
     }
 
     func setDocument(_ data: Data?) {

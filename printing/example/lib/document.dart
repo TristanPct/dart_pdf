@@ -104,7 +104,7 @@ class Category extends StatelessWidget {
 }
 
 Future<PdfDocument> generateDocument(PdfPageFormat format) async {
-  print('generateDocument');
+  print('generateDocument $format');
   final PdfDoc pdf = PdfDoc(title: 'My Résumé', author: 'David PHAM-VAN');
 
   final PdfImage profileImage = await pdfImageFromImageProvider(
